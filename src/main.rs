@@ -1,7 +1,10 @@
 use std::io::{self, Write};
+use std::fs::{read, File};
+use std::path::{self, Path};
+use serde::{Deserialize, Serialize};
+use std::io::BufReader;
 
-
-fn main(){
+fn main()-> Result<(), Box<dyn std::error::Error>>{
 
 // ? Getting the api key
     let mut api_key = String::new();
@@ -49,4 +52,28 @@ fn main(){
         
     }
     println!("{}", model_choice);
+
+    let path_to_file = std::path::Path::new("test.json");
+    let extracted_info: ApiInfo = read_json(path_to_file)?;
+    println!("\nApi: {}\nModel: {}", extracted_info.api_key, extracted_info.model);
+
+    Ok(())
+}
+
+
+#[derive(Deserialize, Serialize)]
+struct ApiInfo{
+    api_key : String,
+    model : String,
+}
+
+fn read_json(file_path : &Path) -> Result<ApiInfo, io::Error>{
+
+    let file = File::open(file_path)?;
+    let reader = BufReader::new(file);
+
+    let extractor = serde_json::from_reader(reader)?;
+    Ok(extractor)
+
+
 }
