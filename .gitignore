@@ -4,6 +4,4 @@
 # Ignore bin directory inside src
 /src/bin
 
-# Other common ignores
-**/*.log
-**/*.tmp
+/src/*.json
