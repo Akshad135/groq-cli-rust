@@ -4,6 +4,12 @@ use std::path::{self, Path};
 use serde::{Deserialize, Serialize};
 use std::io::BufReader;
 
+#[derive(Deserialize, Serialize)]
+struct ApiInfo{
+    api_key : String,
+    model : String,
+}
+
 fn main()-> Result<(), Box<dyn std::error::Error>>{
 
 // ? Getting the api key
@@ -17,16 +23,8 @@ fn main()-> Result<(), Box<dyn std::error::Error>>{
     let api_key: String = api_key.trim().parse()
         .expect("Failed to parse the api key");
 
-    println!("{}", api_key);
 
 // ? Getting the model choice 
-    let models = vec![
-        "LLaMA3 8b",
-        "LLaMA3 70b",
-        "Mixtral 8x7b",
-        "Gemma 7b"
-    ];
-    let mut model_choice_input = String::new();
     let mut model_choice = String::new();
     loop{
         println!("-------------------------------------------------");
@@ -38,10 +36,10 @@ fn main()-> Result<(), Box<dyn std::error::Error>>{
         io::stdout().flush().expect("Failed to flush the print buffer");
 
     
-        io::stdin().read_line(&mut model_choice_input)
+        io::stdin().read_line(&mut model_choice)
             .expect("Can't read the model input");
 
-        let model_choice_input = match model_choice_input.trim().parse::<i32>(){
+        let model_choice = match model_choice.trim().parse::<i32>(){
             Ok(1) => {model_choice = "LLaMA3 8b".to_string(); break},
             Ok(2) => {model_choice = "Mixtral 8x7b".to_string(); break},
             Ok(3) => {model_choice = "LLaMA3 70b".to_string(); break},
@@ -51,8 +49,17 @@ fn main()-> Result<(), Box<dyn std::error::Error>>{
         };
         
     }
-    println!("{}", model_choice);
 
+
+    // ? Adding the final choice to the struct
+    let final_choice = ApiInfo{
+        api_key : api_key,
+        model : model_choice
+    };
+
+    println!("\nApi key: {}\nModel: {}", final_choice.api_key, final_choice.model);
+
+    // ? reading the json file
     let path_to_file = std::path::Path::new("test.json");
     let extracted_info: ApiInfo = read_json(path_to_file)?;
     println!("\nApi: {}\nModel: {}", extracted_info.api_key, extracted_info.model);
@@ -61,11 +68,6 @@ fn main()-> Result<(), Box<dyn std::error::Error>>{
 }
 
 
-#[derive(Deserialize, Serialize)]
-struct ApiInfo{
-    api_key : String,
-    model : String,
-}
 
 fn read_json(file_path : &Path) -> Result<ApiInfo, io::Error>{
 
