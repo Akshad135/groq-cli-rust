@@ -11,3 +11,7 @@ serde = {version ="1.0.203" , features = ["derive"]}
 reqwest = {version="0.12.4", features=["blocking", "json"] }
 tokio = { version = "1", features = ["full"] }
 thiserror = "1.0.61"
+
+[[bin]]
+name = "grrc"  # The command users will type to run your tool
+path = "src/main.rs"
