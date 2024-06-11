@@ -204,12 +204,34 @@ async fn call_api(file_path : &Path) -> Result<(), MyError>{
         .await?;
 
     let body_text = response.text().await?;
-    let api_response: ApiResponse = serde_json::from_str(&body_text)?;
+    let api_response: Result<ApiResponse, serde_json::Error> = serde_json::from_str::<ApiResponse>(&body_text);
 
-    for choice in api_response.choices {
-        println!("-----------------------------------------------------------------------------------");
-        println!("{}", choice.message.content);
+    match api_response {
+        Ok(api_response) => {
+            for choice in api_response.choices {
+                println!("-----------------------------------------------------------------------------------");
+                println!("{}", choice.message.content);
+            }
+        }
+        Err(_) => {
+            let error_response: Result<serde_json::Value, _> = serde_json::from_str(&body_text);
+            match error_response {
+                Ok(error_response) => {
+                    if let Some(error) = error_response.get("error") {
+                        if let Some(message) = error.get("message") {
+                            if let Some(message_text) = message.as_str() {
+                                println!("Error message: {}", message_text);
+                            }
+                        }
+                    }
+                }
+                Err(_) => {
+                    println!("Error parsing error response");
+                }
+            }
+        }
     }
+    
 
     Ok(())
 }
