@@ -51,8 +51,42 @@ struct MessagePart {
     content: String,
 }
 
-// #[tokio::main]
+
 fn main() -> Result<(), MyError> {
+    let args : Vec<String> = std::env::args().collect();
+    let path_to_file = Path::new("config.json");
+
+    if args.len() == 2 {
+        match args[1].as_str() {
+            "-s" | "--setup" => {
+                info(&path_to_file)?;
+            }
+            "-h" | "--help" => {
+                help();
+                return Ok(());
+            }
+            arg => {
+                println!("Unknown argument: \"{}\"", arg);
+                help();
+                return Ok(());
+            }
+        }
+    } else if args.len() == 1 {
+        entry()?;
+    } else {
+        help();
+    }
+
+    Ok(())
+}
+
+fn help(){
+    let cmd = "mycli";
+    println!("{} [--s | --setup] : Initialize the setup", cmd);
+    println!("{} [--h | --help] : Shows avaiable cmds", cmd);
+}
+
+fn entry() -> Result<(), MyError> {
     let path_to_file = Path::new("config.json");
 
     // Check if the file exists
@@ -93,7 +127,7 @@ fn write_json(file_path: &Path, data: &ApiInfo) -> Result<(), MyError> {
 
 fn info(path_to_file: &Path) -> Result<ApiInfo, MyError> {
     // Getting the api key
-    println!("Initalizing setup:");
+    println!("Initializing setup");
     let mut api_key = String::new();
     print!("Enter your Api Key: ");
     io::stdout().flush()?;
@@ -138,7 +172,9 @@ async fn call_api(file_path : &Path) -> Result<(), MyError>{
     let extracted_info = read_json(file_path)?;
     let my_token = extracted_info.api_key;
 
-    println!("Enter your query: ");
+    print!("Enter your query: ");
+    io::stdout().flush().expect("Failed to flush stdout");
+
     let mut data_content = String::new();
     io::stdin().read_line(&mut data_content)
         .expect("Failed to read query");
@@ -171,7 +207,7 @@ async fn call_api(file_path : &Path) -> Result<(), MyError>{
     let api_response: ApiResponse = serde_json::from_str(&body_text)?;
 
     for choice in api_response.choices {
-        println!("-------------------------------------------------------");
+        println!("-----------------------------------------------------------------------------------");
         println!("{}", choice.message.content);
     }
 
