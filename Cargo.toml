@@ -11,3 +11,7 @@ serde = {version ="1.0.203" , features = ["derive"]}
 reqwest = {version="0.12.4", features=["blocking", "json"] }
 tokio = { version = "1", features = ["full"] }
 thiserror = "1.0.61"
+
+[[bin]]
+name = "gcli"
+path = "src/main.rs"
