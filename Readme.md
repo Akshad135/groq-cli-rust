@@ -10,7 +10,7 @@
   - Download the source code.
   - `cd` into the directory
   - In your terminal run `cargo build && cargo install --path .`
-  - _Note: Building requires Rust to be install and configured_
+  - _Note: Building requires Rust to be installed and configured_
 
 ## Usage
 
