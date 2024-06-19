@@ -1,5 +1,5 @@
 [package]
-name = "groq_cli"
+name = "groq-cli"
 version = "0.1.0"
 edition = "2021"
 
