@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use reqwest::Client;
 
+// A custom enum for all the errors *I could think of*
 #[derive(Error, Debug)]
 pub enum MyError {
     #[error("IO error")]
@@ -18,12 +19,14 @@ pub enum MyError {
     Other(String),
 }
 
+// Struct which will be used to store data into json file
 #[derive(Deserialize, Serialize)]
 struct ApiInfo {
     api_key: String,
     model: String,
 }
 
+// The following sturcts are made to receieve the respone from groq
 #[derive(Deserialize)]
 struct ApiResponse { 
     choices: Vec<Choice>,
@@ -39,6 +42,7 @@ struct Message {
     content: String,
 }
 
+// The following structs are made for sending the request to groq
 #[derive(Deserialize, Serialize)]
 struct JsonRequest {
     messages: Vec<MessagePart>,
@@ -56,6 +60,7 @@ fn main() -> Result<(), MyError> {
     let args : Vec<String> = std::env::args().collect();
     let path_to_file = Path::new("config.json");
 
+    // Checks if the user is trying to use a arg or not
     if args.len() == 2 {
         match args[1].as_str() {
             "-s" | "--setup" => {
@@ -80,12 +85,15 @@ fn main() -> Result<(), MyError> {
     Ok(())
 }
 
+// The help msg printed when help arg is used
 fn help(){
     let cmd = "mycli";
+    println!("{} : Asks the user for query", cmd);
     println!("{} [--s | --setup] : Initialize the setup", cmd);
     println!("{} [--h | --help] : Shows avaiable cmds", cmd);
 }
 
+// The function which will server as entry point called from main function
 fn entry() -> Result<(), MyError> {
     let path_to_file = Path::new("config.json");
 
@@ -111,6 +119,7 @@ fn entry() -> Result<(), MyError> {
     Ok(())
 }
 
+// Reads the json file
 fn read_json(file_path: &Path) -> Result<ApiInfo, MyError> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
@@ -118,6 +127,7 @@ fn read_json(file_path: &Path) -> Result<ApiInfo, MyError> {
     Ok(extractor)
 }
 
+// Writes in the json file
 fn write_json(file_path: &Path, data: &ApiInfo) -> Result<(), MyError> {
     let file = OpenOptions::new().write(true).truncate(true).open(file_path)?;
     let mut writer = BufWriter::new(file);
@@ -125,6 +135,7 @@ fn write_json(file_path: &Path, data: &ApiInfo) -> Result<(), MyError> {
     Ok(())
 }
 
+// Takes the initial api key and model from the user and calls write_json()
 fn info(path_to_file: &Path) -> Result<ApiInfo, MyError> {
     // Getting the api key
     println!("Initializing setup");
@@ -167,6 +178,7 @@ fn info(path_to_file: &Path) -> Result<ApiInfo, MyError> {
     Ok(final_choice)
 }
 
+// Function which does all the job of interacting with the groq api
 #[tokio::main]
 async fn call_api(file_path : &Path) -> Result<(), MyError>{
     let extracted_info = read_json(file_path)?;
@@ -206,6 +218,7 @@ async fn call_api(file_path : &Path) -> Result<(), MyError>{
     let body_text = response.text().await?;
     let api_response: Result<ApiResponse, serde_json::Error> = serde_json::from_str::<ApiResponse>(&body_text);
 
+    // Check for any errors while interacting with the api
     match api_response {
         Ok(api_response) => {
             for choice in api_response.choices {
