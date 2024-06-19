@@ -4,6 +4,7 @@
 
 ## Downloads
 
+- From crates.io: [groq-cli](https://crates.io/crates/groq-cli)
 - From releases (Binary File) [click here](https://github.com/Akshad135/groq-cli-rust/releases/tag/v0.1.0)
   - _Instructions to use the binary file is mentioned with the file_
 - Or build it yourself:
