@@ -1,11 +1,12 @@
 [package]
 name = "groq-cli"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Akshad Agrawal"]
 description = "A basic Cli to interact with Groq Api"
 readme = "Readme.md"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/Akshad135/groq-cli-rust"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
